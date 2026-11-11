@@ -238,4 +238,4 @@ for Machine Learning on Graphs?* (2024). Baseline numbers are taken from the pub
 
 ## License
 
-MIT; see [LICENSE](LICENSE).
+Apache License 2.0; see [LICENSE](LICENSE).
