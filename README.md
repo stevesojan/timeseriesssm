@@ -101,7 +101,7 @@ TimeSeriesSSM needs Python 3.10 or later; its only dependencies are PyTorch, Num
 git clone https://github.com/stevesojan/timeseriesssm.git
 cd timeseriesssm
 pip install -e .            # or: pip install -r requirements.txt
-python -m pytest tests      # 94 tests, CPU, about a minute
+python -m pytest tests      # 91 tests, CPU, about a minute
 ```
 
 For GPU training, install a CUDA build of PyTorch first (https://pytorch.org). The results were produced with

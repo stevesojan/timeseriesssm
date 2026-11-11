@@ -102,3 +102,15 @@ def test_timestamps_required_for_cycle_removal():
     f = Forecaster(SMALL, {"epochs": 1}, horizon=24, device="cpu")
     with pytest.raises(ValueError):
         f.fit(x[:800], verbose=False)
+
+
+def test_cycle_phase_from_float64_stamps_matches_index_phase():
+    """The cycle phase is computed from float64 seconds, so it stays exact far from the epoch (float32 would not)."""
+    for step, w, freq in ((600.0, 144, "10min"), (3600.0, 168, "h")):
+        f = Forecaster({**SMALL, "rcf_cycle": w}, {"epochs": 1}, horizon=24, freq=freq, device="cpu")
+        f.step = step
+        stamps = 2 * 7 * 86400 + step * np.arange(60000, dtype=np.float64)
+        for start in (0, 1, 12345, 59000):
+            ph = f._phase(torch.from_numpy(stamps[start:start + 144]).unsqueeze(0))[0]
+            ref = (torch.arange(start, start + 144) + int(stamps[0] // step)) % w
+            assert torch.equal(ph, ref)

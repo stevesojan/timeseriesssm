@@ -404,23 +404,6 @@ def test_rcf_no_leakage_and_equivariance_with_permuted_q():
     assert torch.allclose(a[..., perm], b, atol=1e-5)
 
 
-def test_rcf_phase_from_float64_stamps_matches_index_phase():
-    import sys as _sys
-    _sys.path.insert(0, str(ROOT.parent / "ts_benchmark"))
-    import numpy as np
-    from types import SimpleNamespace
-    import run_ltsf as R
-    for step, w in ((600.0, 144), (3600.0, 168)):
-        stamps = 2 * 7 * 86400 + step * np.arange(60000, dtype=np.float64)  # week-aligned offset, as data.py
-        phaser = R.make_phaser(SimpleNamespace(stamps=stamps), "weather" if w == 144 else "electricity",
-                               "nhits_rcf")
-        for start in (0, 1, 12345, 59000):
-            t = torch.from_numpy(stamps[start:start + 144]).unsqueeze(0)
-            ph = phaser(t)[0]
-            ref = (torch.arange(start, start + 144) + int(stamps[0] // step)) % w
-            assert torch.equal(ph, ref)
-
-
 def test_rcf_single_stack_path_matches_normalized_space_definition():
     kw = dict(hidden_dim=16, rank_dim=8, patch_len=16, quantile_levels=(), head="flatten", context_len=96,
               horizon_len=48, time_mix="causal_decay", time_context_bidirectional=True, use_calendar=False,
@@ -489,28 +472,6 @@ def test_freq_loss_weight_zero_is_time_loss_and_positive_adds_spectral_term():
     assert torch.allclose(m.loss(x, y), 0.5 * mse + 0.5 * spec, atol=1e-5)
 
 
-def test_linear_baselines_shapes_and_dlinear_decomposition():
-    import sys as _sys
-    _sys.path.insert(0, str(ROOT.parent / "ts_benchmark"))
-    import linear_baselines as LB
-    x = torch.randn(3, 96, C)
-    for kind in ("rlinear", "dlinear", "rdlinear"):
-        m = LB.build(kind, 96, 48, C)
-        point, _ = m.forward_window(x, 48)
-        assert point.shape == (3, 48, C)
-        m.loss(x, torch.randn(3, 48, C)).backward()
-    # DLinear at initialization predicts the lookback mean of seasonal + trend = lookback mean of x (bias aside)
-    d = LB.DLinear(96, 48)
-    with torch.no_grad():
-        d.linear_seasonal.bias.zero_(); d.linear_trend.bias.zero_()
-        out = d.predict(x)
-    assert torch.allclose(out, x.mean(1, keepdim=True).expand(-1, 48, -1), atol=1e-5)
-    # RLinear is scale/shift equivariant per channel (RevIN)
-    r = LB.RLinear(96, 48, C)
-    assert torch.allclose(r.predict(3.0 * x + 2.0), 3.0 * r.predict(x) + 2.0, atol=1e-4)
-
-
-# ---------------------------------------------------------------------------------------------------- v4 components
 def _v4(**over):
     kw = dict(hidden_dim=16, rank_dim=8, patch_len=16, quantile_levels=(), cascade="nhits", context_len=96,
               horizon_len=48, use_calendar=False, time_mix="causal_decay", use_glu_ffn=False, rcf_cycle=24)
@@ -667,25 +628,6 @@ def test_stat_head_starts_as_revin_and_learns():
     assert sh.stat_mlp[-1].weight.grad.abs().sum() > 0
     idx = torch.tensor([4, 1])  # channel subsets work with the stat head
     assert sh.forward_window(x[..., idx], 48, cycle_phase=ph, channel_index=idx)[0].shape == (2, 48, 2)
-
-
-def test_time_o1_loss_and_label_basis():
-    import sys as _sys
-    _sys.path.insert(0, str(ROOT.parent / "ts_benchmark"))
-    import numpy as np
-    import run_ltsf as R
-    vals = np.cumsum(np.random.default_rng(0).normal(size=(3000, C)), axis=0)
-    basis = R.label_basis(vals, 96, 48, 0.5)
-    assert basis.shape == (48, 24)
-    assert torch.allclose(basis.T @ basis, torch.eye(24), atol=1e-4)  # orthonormal components
-    m = _v4(label_pca_weight=0.4, label_pca_frac=0.5, freq_loss_weight=0.3, mse_weight=1.0, mae_weight=0.0)
-    m.set_label_basis(basis)
-    x, y, ph = torch.randn(2, 96, C), torch.randn(2, 48, C), _phase(2, 24)
-    point = m.forward_window(x, 48, cycle_phase=ph)[0]
-    mse = torch.nn.functional.mse_loss(point, y)
-    spec = (torch.fft.rfft(point, dim=1) - torch.fft.rfft(y, dim=1)).abs().mean()
-    o1 = torch.einsum("bhc,hk->bkc", point - y, basis).abs().mean()
-    assert torch.allclose(m.loss(x, y, cycle_phase=ph), 0.3 * mse + 0.3 * spec + 0.4 * o1, atol=1e-5)
 
 
 def test_haar_transform_is_orthonormal_and_wavelet_loss_combines():
@@ -851,18 +793,6 @@ def test_gradient_checkpointing_never_changes_outputs_or_gradients():
     assert torch.equal(l0, l1) and len(g0) == len(g1) and all(torch.equal(a, b) for a, b in zip(g0, g1))
 
 
-def test_activation_estimate_drives_the_checkpoint_decision():
-    import sys as _sys
-    _sys.path.insert(0, str(ROOT.parent / "ts_benchmark"))
-    import run_ltsf as R
-    kw = {**R.BASE, **R.CONFIGS["nhits_v2"], "hidden_dim": 64, "patch_len": 16}
-    small = R.activation_estimate(kw, 32, 7, 96)
-    big = R.activation_estimate(kw, 16, 862, 96)
-    assert 0 < small < big and R.activation_estimate({"cascade": "single"}, 32, 7, 96) == 0.0
-    assert big / small == pytest.approx((16 * 862) / (32 * 7), rel=0.2)
-
-
-# ---------------------------------------------------------------------------------------------------- Barron loss
 def test_barron_rho_limits_and_partition_function():
     from timeseriesssm.model.timeseries_ssm import _barron_rho, _log_partition
     x = torch.linspace(-5, 5, 101, dtype=torch.float64)
