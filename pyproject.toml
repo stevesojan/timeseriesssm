@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "timeseriesssm"
+version = "1.0.0"
+description = "TimeSeriesSSM: multivariate long-term forecasting with graph state-space convolution across channels"
+readme = "README.md"
+license = {text = "MIT"}
+authors = [{name = "Steve Sojan"}]
+requires-python = ">=3.10"
+dependencies = ["torch>=2.1", "numpy>=1.24", "pandas>=1.5"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+
+[project.urls]
+Repository = "https://github.com/stevesojan/timeseriesssm"
+
+[project.optional-dependencies]
+test = ["pytest"]
+
+[tool.setuptools.packages.find]
+include = ["timeseriesssm*"]
+
+[tool.setuptools.package-data]
+timeseriesssm = ["presets/*.json"]

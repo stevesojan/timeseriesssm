@@ -1,0 +1,49 @@
+{
+  "dataset": "ETTh2",
+  "csv": "ETTh2.csv",
+  "freq": "h",
+  "seq_len": 96,
+  "horizons": [
+    96,
+    192,
+    336,
+    720
+  ],
+  "model": {
+    "patch_len": 8,
+    "hidden_dim": 192,
+    "rank_dim": 128,
+    "num_blocks": 2,
+    "dropout": 0.1,
+    "quantile_levels": [],
+    "mse_weight": 0.0,
+    "mae_weight": 1.0,
+    "pinball_weight": 0.0,
+    "time_mix": "off",
+    "time_context_bidirectional": false,
+    "cascade": "nhits",
+    "use_glu_ffn": false,
+    "nhits_blocks_per_stack": 1,
+    "use_revin": true,
+    "use_calendar": false,
+    "linear_path": true,
+    "channel_mix_scale": 0.0,
+    "channel_mix_learn": true,
+    "series_tokens": false,
+    "freq_loss_weight": 0.8,
+    "lowpass_frac": 0.0,
+    "stat_head": true,
+    "horizon_weight": "arctan",
+    "rcf_cycle": 24
+  },
+  "train": {
+    "lr": 0.0011577858967920655,
+    "schedule": "cosine",
+    "epochs": 10,
+    "patience": 10,
+    "batch_size": 16,
+    "weight_decay": 1e-05,
+    "grad_clip": 0.0,
+    "ema_decay": 0.995
+  }
+}

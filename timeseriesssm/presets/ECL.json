@@ -1,0 +1,52 @@
+{
+  "dataset": "ECL",
+  "csv": "electricity.csv",
+  "freq": "h",
+  "seq_len": 96,
+  "horizons": [
+    96,
+    192,
+    336,
+    720
+  ],
+  "model": {
+    "patch_len": 8,
+    "hidden_dim": 192,
+    "rank_dim": 48,
+    "num_blocks": 2,
+    "dropout": 0.0,
+    "quantile_levels": [],
+    "mse_weight": 0.0,
+    "mae_weight": 1.0,
+    "pinball_weight": 0.0,
+    "time_mix": "off",
+    "time_context_bidirectional": false,
+    "cascade": "nhits",
+    "use_glu_ffn": false,
+    "nhits_blocks_per_stack": 1,
+    "use_revin": true,
+    "use_calendar": false,
+    "linear_path": true,
+    "channel_mix_scale": 0.0,
+    "channel_mix_learn": true,
+    "series_tokens": true,
+    "series_dim": 256,
+    "series_layers": 2,
+    "freq_loss_weight": 0.25,
+    "lowpass_frac": 0.5,
+    "stat_head": true,
+    "horizon_weight": "arctan",
+    "series_mixer": "both",
+    "rcf_cycle": 168
+  },
+  "train": {
+    "lr": 0.000247736974149801,
+    "schedule": "cosine",
+    "epochs": 20,
+    "patience": 20,
+    "batch_size": 32,
+    "weight_decay": 0.01,
+    "grad_clip": 0.0,
+    "ema_decay": 0.995
+  }
+}
