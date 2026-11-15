@@ -11,7 +11,8 @@ class SelectivePositionUpdate(nn.Module):
     Data-dependent update for positional encodings.
 
     Produces a per-sample, per-feature z_tilde while preserving the same
-    factorized global aggregation pattern as GSSC Eq. (6)-style updates.
+    factorized global aggregation pattern as GSSC Eq. (6)-style updates (Huang, Miao & Li, 2026). As in the
+    arXiv version of Eq. (6), each feature weights its own code; the TPAMI version sums the codes of all features.
     """
 
     def __init__(self, z_dim: int, hidden_dim: int, rank_dim: int) -> None:

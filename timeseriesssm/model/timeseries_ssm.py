@@ -186,7 +186,7 @@ class TimeSeriesSSMConfig:
     # "canonical" = largest-magnitude entry positive, so codes recomputed from permuted channels are permuted codes
     channel_graph_sign: Literal["solver", "canonical"] = "solver"
     # channel mixing kernel: "rank" = rank-R state with addresses W_g z (earlier runs, the reported models);
-    # "spectral" = Eq. 4 of Huang, Miao & Li (2024) on static codes scaled by one global scalar (no LayerNorm),
+    # "spectral" = Eq. 4 of Huang, Miao & Li (2026) on static codes scaled by one global scalar (no LayerNorm),
     # invariant to the eigenvector signs (ablation; needs use_selective=False)
     channel_kernel: Literal["rank", "spectral", "attention", "star"] = "rank"
     time_pe: str = "learned"

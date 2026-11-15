@@ -4,7 +4,7 @@
 Steve Sojan, 2026 (preprint)
 
 TimeSeriesSSM is a multivariate long-term forecaster that mixes channels with a modified form of
-**graph state-space convolution (GSSC)** (Huang, Miao & Li, 2024). Each channel receives an *address* derived from a
+**graph state-space convolution (GSSC)** (Huang, Miao & Li, IEEE TPAMI 2026). Each channel receives an *address* derived from a
 correlation graph that is estimated on the training data and adjusted by the content of its series. It writes into a
 single shared low-rank state and reads the state back through the same address. The cost is linear in the number of
 channels for a fixed state rank, and no channel-by-channel matrix is ever formed.
@@ -233,8 +233,26 @@ figures/                 figures of the paper
 }
 ```
 
-TimeSeriesSSM builds on graph state-space convolution: Huang, Miao and Li, *What Can We Learn from State Space Models
-for Machine Learning on Graphs?* (2024). Baseline numbers are taken from the publications of the respective models.
+TimeSeriesSSM builds on graph state-space convolution (GSSC): Yinan Huang, Siqi Miao and Pan Li, *How Can State Space
+Models Enhance Machine Learning on Graphs?*, IEEE Transactions on Pattern Analysis and Machine Intelligence,
+48(8):10184-10191, 2026, [doi:10.1109/TPAMI.2026.3680437](https://doi.org/10.1109/TPAMI.2026.3680437). The
+open-access preprint, titled *What Can We Learn from State Space Models for Machine Learning on Graphs?*, is
+[arXiv:2406.05815](https://arxiv.org/abs/2406.05815).
+
+```bibtex
+@article{huang2026gssc,
+  title   = {How Can State Space Models Enhance Machine Learning on Graphs?},
+  author  = {Huang, Yinan and Miao, Siqi and Li, Pan},
+  journal = {IEEE Transactions on Pattern Analysis and Machine Intelligence},
+  volume  = {48},
+  number  = {8},
+  pages   = {10184--10191},
+  year    = {2026},
+  doi     = {10.1109/TPAMI.2026.3680437}
+}
+```
+
+Baseline numbers are taken from the publications of the respective models.
 
 ## License
 

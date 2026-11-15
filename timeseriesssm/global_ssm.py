@@ -63,7 +63,7 @@ class GlobalFeatureSSM(nn.Module):
 
 class SpectralGSSC(nn.Module):
     """
-    GSSC as defined by Huang, Miao & Li (2024, arXiv:2406.05815, Eq. 4), along the feature axis:
+    GSSC as defined by Huang, Miao & Li (IEEE TPAMI 2026, Eq. 4; arXiv:2406.05815), along the feature axis:
         h_f = sum_{f'} <Z_f U_q, Z_{f'} U_k> * U_o x_{f'} + <Z_f U_sq, Z_f U_sk> * U_s x_f
     with codes Z_f in R^{d x M} (entries phi_m(lambda_j) e_{j,f}, at most divided by one global scalar). The U act on the filter axis and
     <.,.> sums over the eigenvector index j only, so every hidden feature is mixed by a spectral filter

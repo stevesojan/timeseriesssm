@@ -76,7 +76,7 @@ class TimeSeriesSSMBlock(nn.Module):
                 dropout=dropout,
             )
         # channel_kernel: "rank" = rank-R state with addresses W_g z (the reported models); "spectral" = Eq. 4 of
-        # Huang et al. (2024) on static codes with a global scale, sign-invariant (ablation; needs channel_num_eig/_filters)
+        # Huang et al. (2026) on static codes with a global scale, sign-invariant (ablation; needs channel_num_eig/_filters)
         if channel_kernel == "spectral":
             if use_selective:
                 raise ValueError("channel_kernel='spectral' takes static codes (use_selective=False).")
